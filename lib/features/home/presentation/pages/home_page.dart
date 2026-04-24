@@ -95,9 +95,9 @@ class HomePage extends ConsumerWidget {
             ),
 
             // Health Tips — auto-play carousel with dots
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
                 child: SectionHeader(title: 'Consejos de salud'),
               ),
             ),
@@ -316,25 +316,25 @@ class HomePage extends ConsumerWidget {
 
   Widget _buildQuickActions(BuildContext context) {
     final actions = [
-      _QuickAction(
+      const _QuickAction(
           icon: Icons.calendar_today_rounded,
           label: 'Reservar\ncita',
           color: AppColors.primary,
           path: '/appointments/create'),
-      _QuickAction(
+      const _QuickAction(
           icon: Icons.people_rounded,
           label: 'Nuestros\nmédicos',
           color: AppColors.secondary,
           path: '/doctors'),
-      _QuickAction(
+      const _QuickAction(
           icon: Icons.medical_services_rounded,
           label: 'Especia-\nlidades',
-          color: const Color(0xFF6A1B9A),
+          color: Color(0xFF6A1B9A),
           path: '/specialties'),
-      _QuickAction(
+      const _QuickAction(
           icon: Icons.history_rounded,
           label: 'Mi\nhistorial',
-          color: const Color(0xFFE65100),
+          color: Color(0xFFE65100),
           path: '/history'),
     ];
 

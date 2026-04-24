@@ -129,11 +129,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       children: [
                         const Icon(Icons.email_outlined, color: AppColors.textGray, size: 18),
                         const SizedBox(width: 10),
-                        Text('${user?.email ?? ''}', style: const TextStyle(color: AppColors.textGray)),
+                        Text(user?.email ?? '', style: const TextStyle(color: AppColors.textGray)),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'El DNI y correo no pueden ser modificados',
                       style: TextStyle(fontSize: 11, color: AppColors.textLight),
                     ),

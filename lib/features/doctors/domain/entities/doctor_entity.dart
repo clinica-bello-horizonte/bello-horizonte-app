@@ -33,7 +33,7 @@ class DoctorEntity extends Equatable {
   String get initials {
     final f = firstName.isNotEmpty ? firstName[0] : '';
     final l = lastName.isNotEmpty ? lastName[0] : '';
-    return '${f}${l}'.toUpperCase();
+    return '$f$l'.toUpperCase();
   }
 
   String get availabilityText {

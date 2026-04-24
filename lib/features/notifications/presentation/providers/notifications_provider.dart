@@ -11,7 +11,7 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
     _init();
   }
 
-  static final _uuid = Uuid();
+  static const _uuid = Uuid();
   final _repo = NotificationsRepository.instance;
 
   Future<void> _init() async {
