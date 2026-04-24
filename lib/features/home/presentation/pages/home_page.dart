@@ -328,7 +328,7 @@ class HomePage extends ConsumerWidget {
           path: '/doctors'),
       _QuickAction(
           icon: Icons.medical_services_rounded,
-          label: 'Especiali-\ndades',
+          label: 'Especia-\nlidades',
           color: const Color(0xFF6A1B9A),
           path: '/specialties'),
       _QuickAction(

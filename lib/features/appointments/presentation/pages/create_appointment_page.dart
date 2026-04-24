@@ -627,7 +627,7 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
                         ? AppColors.textLight
                         : isSelected
                             ? Colors.white
-                            : AppColors.textDark,
+                            : Theme.of(context).colorScheme.onSurface,
                     decoration:
                         isBooked ? TextDecoration.lineThrough : null,
                   ),

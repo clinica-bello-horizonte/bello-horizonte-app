@@ -15,7 +15,9 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).user;
     final themeMode = ref.watch(themeModeProvider);
-    final isDark = themeMode == ThemeMode.dark;
+    final systemBrightness = MediaQuery.platformBrightnessOf(context);
+    final isDark = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system && systemBrightness == Brightness.dark);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -115,7 +117,7 @@ class SettingsPage extends ConsumerWidget {
                   subtitle: isDark ? 'Activado' : 'Desactivado',
                   trailing: Switch.adaptive(
                     value: isDark,
-                    onChanged: (_) => ref.read(themeModeProvider.notifier).toggle(),
+                    onChanged: (_) => ref.read(themeModeProvider.notifier).toggle(systemBrightness),
                     activeColor: AppColors.primary,
                   ),
                   onTap: null,
