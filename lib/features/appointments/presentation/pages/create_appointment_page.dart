@@ -641,36 +641,40 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
   }
 
   Widget _buildReasonStep() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Motivo de la consulta', style: AppTextStyles.h2),
-        const SizedBox(height: 6),
-        Text('Describe brevemente el motivo de tu visita',
-            style: AppTextStyles.bodyMedium
-                .copyWith(color: AppColors.textGray)),
-        const SizedBox(height: 20),
-        _buildSummaryCard(),
-        const SizedBox(height: 20),
-        AppTextField(
-          label: 'Motivo de consulta *',
-          hint:
-              'Ej: Dolor de cabeza persistente, chequeo general, revisión de presión...',
-          controller: _reasonController,
-          maxLines: 3,
-          maxLength: 200,
-          onChanged: (_) => setState(() {}),
-        ),
-        const SizedBox(height: 16),
-        AppTextField(
-          label: 'Notas adicionales (opcional)',
-          hint:
-              'Alergias, medicamentos actuales, síntomas adicionales...',
-          controller: _notesController,
-          maxLines: 2,
-          maxLength: 300,
-        ),
-      ],
+    return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Motivo de la consulta', style: AppTextStyles.h2),
+          const SizedBox(height: 6),
+          Text('Describe brevemente el motivo de tu visita',
+              style: AppTextStyles.bodyMedium
+                  .copyWith(color: AppColors.textGray)),
+          const SizedBox(height: 20),
+          _buildSummaryCard(),
+          const SizedBox(height: 20),
+          AppTextField(
+            label: 'Motivo de consulta *',
+            hint:
+                'Ej: Dolor de cabeza persistente, chequeo general, revisión de presión...',
+            controller: _reasonController,
+            maxLines: 3,
+            maxLength: 200,
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: 'Notas adicionales (opcional)',
+            hint:
+                'Alergias, medicamentos actuales, síntomas adicionales...',
+            controller: _notesController,
+            maxLines: 2,
+            maxLength: 300,
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 
