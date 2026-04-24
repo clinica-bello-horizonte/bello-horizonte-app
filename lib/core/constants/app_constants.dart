@@ -5,7 +5,7 @@ class AppConstants {
   static const String appTagline = 'Tu familia es nuestra prioridad';
   static const String appSubTagline = 'Primera clínica del sector oeste de Piura';
   static const String dbName = 'bello_horizonte.db';
-  static const int dbVersion = 2;
+  static const int dbVersion = 3;
 
   // Secure storage keys
   static const String sessionUserIdKey = 'session_user_id';

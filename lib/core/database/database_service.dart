@@ -44,10 +44,11 @@ class DatabaseService {
         await db.execute(
           "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'",
         );
-      } catch (_) {
-        // Column already exists — safe to ignore
-      }
+      } catch (_) {}
       await _seedAdminUser(db);
+    }
+    if (oldVersion < 3) {
+      await _createNotificationsTable(db);
     }
   }
 
@@ -127,6 +128,22 @@ class DatabaseService {
         specialty_name TEXT,
         created_at TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users (id)
+      )
+    ''');
+
+    await _createNotificationsTable(db);
+  }
+
+  Future<void> _createNotificationsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS notifications (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        is_read INTEGER NOT NULL DEFAULT 0,
+        route_path TEXT
       )
     ''');
   }

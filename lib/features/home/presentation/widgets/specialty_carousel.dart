@@ -291,7 +291,6 @@ class _SpecialtyDetailSheet extends StatelessWidget {
                   '¿Te gustaría sacar una cita con nuestros especialistas?',
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
                   ),
                   textAlign: TextAlign.center,
                 ),

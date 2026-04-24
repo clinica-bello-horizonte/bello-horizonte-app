@@ -16,68 +16,91 @@ class PatientRecordCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Theme.of(context).dividerColor),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2)),
+            BoxShadow(
+              color: AppColors.secondary.withAlpha(14),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.secondaryContainer,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(Icons.description_rounded, color: AppColors.secondary, size: 24),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    record.diagnosis ?? 'Consulta médica',
-                    style: AppTextStyles.cardTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    record.doctorName != null ? 'Dr. ${record.doctorName}' : '',
-                    style: AppTextStyles.cardSubtitle,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
+        clipBehavior: Clip.hardEdge,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(width: 4, color: AppColors.secondary),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           color: AppColors.secondaryContainer,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        child: Text(
-                          record.specialtyName ?? 'General',
-                          style: AppTextStyles.badge.copyWith(color: AppColors.secondary),
+                        child: const Icon(Icons.description_rounded,
+                            color: AppColors.secondary, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              record.diagnosis ?? 'Consulta médica',
+                              style: AppTextStyles.cardTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              record.doctorName != null
+                                  ? 'Dr. ${record.doctorName}'
+                                  : '',
+                              style: AppTextStyles.cardSubtitle,
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondaryContainer,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    record.specialtyName ?? 'General',
+                                    style: AppTextStyles.badge
+                                        .copyWith(color: AppColors.secondary),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  DateFormatter.toDisplay(record.recordDate),
+                                  style: AppTextStyles.caption,
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        DateFormatter.toDisplay(record.recordDate),
-                        style: AppTextStyles.caption,
-                      ),
+                      const Icon(Icons.chevron_right_rounded,
+                          color: AppColors.textLight),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textLight),
-          ],
+            ],
+          ),
         ),
       ),
     );

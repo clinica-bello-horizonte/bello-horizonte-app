@@ -377,8 +377,7 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
                           child: Text(
                             s.name,
                             style: AppTextStyles.labelMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textDark),
+                                fontWeight: FontWeight.w600),
                             textAlign: TextAlign.center,
                             maxLines: 2,
                           ),
@@ -482,8 +481,7 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
                                     Text('${d.rating}',
                                         style: AppTextStyles.caption
                                             .copyWith(
-                                                fontWeight: FontWeight.w600,
-                                                color: AppColors.textDark)),
+                                                fontWeight: FontWeight.w600)),
                                     const SizedBox(width: 8),
                                     Text('${d.yearsExperience} años exp.',
                                         style: AppTextStyles.caption),

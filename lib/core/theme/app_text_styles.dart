@@ -8,11 +8,10 @@ class AppTextStyles {
 
   static TextStyle get _base => GoogleFonts.poppins();
 
-  // Display
+  // Display  (sin color — lo hereda del tema, que sí distingue dark/light)
   static TextStyle get displayLarge => _base.copyWith(
         fontSize: 32,
         fontWeight: FontWeight.w700,
-        color: AppColors.textDark,
         letterSpacing: -0.5,
         height: 1.2,
       );
@@ -20,7 +19,6 @@ class AppTextStyles {
   static TextStyle get displayMedium => _base.copyWith(
         fontSize: 28,
         fontWeight: FontWeight.w700,
-        color: AppColors.textDark,
         letterSpacing: -0.5,
         height: 1.2,
       );
@@ -29,7 +27,6 @@ class AppTextStyles {
   static TextStyle get h1 => _base.copyWith(
         fontSize: 24,
         fontWeight: FontWeight.w700,
-        color: AppColors.textDark,
         letterSpacing: -0.3,
         height: 1.3,
       );
@@ -37,21 +34,18 @@ class AppTextStyles {
   static TextStyle get h2 => _base.copyWith(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: AppColors.textDark,
         height: 1.3,
       );
 
   static TextStyle get h3 => _base.copyWith(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: AppColors.textDark,
         height: 1.4,
       );
 
   static TextStyle get h4 => _base.copyWith(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: AppColors.textDark,
         height: 1.4,
       );
 
@@ -59,21 +53,19 @@ class AppTextStyles {
   static TextStyle get bodyLarge => _base.copyWith(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: AppColors.textDark,
         height: 1.6,
       );
 
   static TextStyle get bodyMedium => _base.copyWith(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: AppColors.textDark,
         height: 1.6,
       );
 
   static TextStyle get bodySmall => _base.copyWith(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: AppColors.textGray,
+        color: AppColors.textGray,  // gris explícito siempre (subtítulos secundarios)
         height: 1.5,
       );
 
@@ -81,7 +73,6 @@ class AppTextStyles {
   static TextStyle get labelLarge => _base.copyWith(
         fontSize: 14,
         fontWeight: FontWeight.w500,
-        color: AppColors.textDark,
         letterSpacing: 0.1,
       );
 
@@ -118,20 +109,17 @@ class AppTextStyles {
   static TextStyle get greeting => _base.copyWith(
         fontSize: 22,
         fontWeight: FontWeight.w700,
-        color: AppColors.textDark,
         height: 1.3,
       );
 
   static TextStyle get sectionTitle => _base.copyWith(
         fontSize: 17,
         fontWeight: FontWeight.w600,
-        color: AppColors.textDark,
       );
 
   static TextStyle get cardTitle => _base.copyWith(
         fontSize: 15,
         fontWeight: FontWeight.w600,
-        color: AppColors.textDark,
       );
 
   static TextStyle get cardSubtitle => _base.copyWith(
@@ -150,7 +138,7 @@ class AppTextStyles {
   static TextStyle get whiteBody => _base.copyWith(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withAlpha(229),
       );
 
   static TextStyle get price => _base.copyWith(

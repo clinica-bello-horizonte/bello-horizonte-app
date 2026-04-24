@@ -87,7 +87,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withAlpha(51),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -103,7 +103,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                   Text(
                     'Clínica',
                     style: AppTextStyles.displayMedium.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withAlpha(229),
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -118,7 +118,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                   Text(
                     'Tu familia es nuestra prioridad',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withAlpha(204),
                     ),
                   ),
                   const SizedBox(height: 60),

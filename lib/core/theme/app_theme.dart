@@ -30,6 +30,8 @@ class AppTheme {
           backgroundColor: AppColors.surfaceLight,
           foregroundColor: AppColors.textDark,
           elevation: 0,
+          scrolledUnderElevation: 1,
+          shadowColor: Colors.black.withAlpha(30),
           centerTitle: true,
           titleTextStyle: GoogleFonts.poppins(
             fontSize: 18,
@@ -48,6 +50,7 @@ class AppTheme {
             ),
             elevation: 0,
             textStyle: GoogleFonts.poppins(
+              textStyle: const TextStyle(inherit: false),
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -62,6 +65,7 @@ class AppTheme {
               borderRadius: BorderRadius.circular(14),
             ),
             textStyle: GoogleFonts.poppins(
+              textStyle: const TextStyle(inherit: false),
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -71,6 +75,7 @@ class AppTheme {
           style: TextButton.styleFrom(
             foregroundColor: AppColors.primary,
             textStyle: GoogleFonts.poppins(
+              textStyle: const TextStyle(inherit: false),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -125,7 +130,11 @@ class AppTheme {
         chipTheme: ChipThemeData(
           backgroundColor: AppColors.surfaceVariantLight,
           selectedColor: AppColors.primaryContainer,
-          labelStyle: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+          labelStyle: GoogleFonts.poppins(
+            textStyle: const TextStyle(inherit: false),
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           side: BorderSide.none,
         ),
@@ -197,7 +206,11 @@ class AppTheme {
             minimumSize: const Size(double.infinity, 52),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             elevation: 0,
-            textStyle: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600),
+            textStyle: GoogleFonts.poppins(
+              textStyle: const TextStyle(inherit: false),
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(

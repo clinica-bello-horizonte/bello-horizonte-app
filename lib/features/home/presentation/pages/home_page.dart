@@ -11,6 +11,7 @@ import '../../../../core/widgets/section_header.dart';
 import '../../../appointments/presentation/providers/appointments_provider.dart';
 import '../../../appointments/presentation/widgets/appointment_card.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../notifications/presentation/providers/notifications_provider.dart';
 import '../../../specialties/presentation/providers/specialties_provider.dart';
 import '../providers/home_provider.dart';
 
@@ -23,6 +24,7 @@ class HomePage extends ConsumerWidget {
     final upcomingAsync = ref.watch(activeUpcomingAppointmentsProvider);
     final healthTips = ref.watch(healthTipsProvider);
     final specialtiesAsync = ref.watch(specialtiesProvider);
+    final unreadCount = ref.watch(unreadCountProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -36,7 +38,7 @@ class HomePage extends ConsumerWidget {
           slivers: [
             // Header
             SliverToBoxAdapter(
-              child: _buildHeader(context, user?.firstName ?? 'Paciente'),
+              child: _buildHeader(context, user?.firstName ?? 'Paciente', unreadCount),
             ),
 
             // Quick Actions
@@ -138,10 +140,16 @@ class HomePage extends ConsumerWidget {
                               width: 68,
                               height: 68,
                               decoration: BoxDecoration(
-                                color: s.color.withAlpha(25),
-                                borderRadius: BorderRadius.circular(18),
-                                border:
-                                    Border.all(color: s.color.withAlpha(75)),
+                                color: s.color.withAlpha(22),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: s.color.withAlpha(60)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: s.color.withAlpha(35),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
                               ),
                               child: Icon(s.iconData, color: s.color, size: 30),
                             ),
@@ -152,7 +160,6 @@ class HomePage extends ConsumerWidget {
                                 s.name,
                                 style: AppTextStyles.caption.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textDark,
                                 ),
                                 textAlign: TextAlign.center,
                                 maxLines: 2,
@@ -190,7 +197,7 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, String name) {
+  Widget _buildHeader(BuildContext context, String name, int unreadCount) {
     final hour = DateTime.now().hour;
     final greeting =
         hour < 12 ? 'Buenos días' : hour < 18 ? 'Buenas tardes' : 'Buenas noches';
@@ -228,37 +235,78 @@ class HomePage extends ConsumerWidget {
                 ],
               ),
               const Spacer(),
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(50),
-                  shape: BoxShape.circle,
+              GestureDetector(
+                onTap: () => context.push('/notifications'),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(50),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.notifications_none_rounded,
+                          color: Colors.white, size: 24),
+                    ),
+                    if (unreadCount > 0)
+                      Positioned(
+                        top: -2,
+                        right: -2,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEF4444),
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                              minWidth: 18, minHeight: 18),
+                          child: Text(
+                            unreadCount > 9 ? '9+' : '$unreadCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              height: 1,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-                child: const Icon(Icons.notifications_none_rounded,
-                    color: Colors.white, size: 24),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.search_rounded,
-                    color: AppColors.textGray, size: 20),
-                const SizedBox(width: 10),
-                Text(
-                  'Buscar médicos, especialidades...',
-                  style: AppTextStyles.bodyMedium
-                      .copyWith(color: AppColors.textLight),
-                ),
-              ],
+          GestureDetector(
+            onTap: () => context.push('/search'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(20),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search_rounded,
+                      color: AppColors.textGray, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Buscar médicos, especialidades...',
+                    style: AppTextStyles.bodyMedium
+                        .copyWith(color: AppColors.textLight),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -428,7 +476,6 @@ class _HealthTipDetailSheet extends StatelessWidget {
               '¿Te gustaría hablar con un especialista?',
               style: AppTextStyles.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark,
               ),
               textAlign: TextAlign.center,
             ),
@@ -491,27 +538,47 @@ class _QuickActionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
         decoration: BoxDecoration(
-          color: action.color.withAlpha(20),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: action.color.withAlpha(50)),
+          color: action.color.withAlpha(18),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: action.color.withAlpha(45)),
+          boxShadow: [
+            BoxShadow(
+              color: action.color.withAlpha(28),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
-                color: action.color.withAlpha(38),
+                gradient: LinearGradient(
+                  colors: [
+                    action.color.withAlpha(200),
+                    action.color,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: action.color.withAlpha(70),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              child: Icon(action.icon, color: action.color, size: 22),
+              child: Icon(action.icon, color: Colors.white, size: 22),
             ),
             const SizedBox(height: 8),
             Text(
               action.label,
               style: AppTextStyles.caption.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

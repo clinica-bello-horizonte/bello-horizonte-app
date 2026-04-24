@@ -177,7 +177,7 @@ class _DemoLoginButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.infoLight,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.info.withOpacity(0.3)),
+          border: Border.all(color: AppColors.info.withAlpha(76)),
         ),
         child: Row(
           children: [

@@ -98,7 +98,7 @@ class PatientRecordDetailPage extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: AppColors.warningLight,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.warning.withAlpha(76)),
                   ),
                   child: Row(
                     children: [
@@ -132,7 +132,7 @@ class PatientRecordDetailPage extends ConsumerWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withAlpha(30),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: color, size: 16),
@@ -146,9 +146,9 @@ class PatientRecordDetailPage extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.05),
+            color: color.withAlpha(13),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withOpacity(0.15)),
+            border: Border.all(color: color.withAlpha(38)),
           ),
           child: Text(content, style: AppTextStyles.bodyMedium.copyWith(height: 1.7)),
         ),

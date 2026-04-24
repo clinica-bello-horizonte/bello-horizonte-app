@@ -42,7 +42,7 @@ class SettingsPage extends ConsumerWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
+                          color: AppColors.primary.withAlpha(76),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -148,6 +148,21 @@ class SettingsPage extends ConsumerWidget {
               ],
             ),
 
+            if (user?.isAdmin == true)
+              _buildSection(
+                context,
+                title: 'Administración',
+                items: [
+                  _SettingsItem(
+                    icon: Icons.campaign_rounded,
+                    title: 'Enviar notificaciones',
+                    subtitle: 'Avisos a pacientes',
+                    iconColor: AppColors.secondary,
+                    onTap: () => context.push('/admin/notifications'),
+                  ),
+                ],
+              ),
+
             _buildSection(
               context,
               title: 'Sesión',
@@ -211,7 +226,7 @@ class SettingsPage extends ConsumerWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: (item.iconColor ?? AppColors.primary).withOpacity(0.1),
+                color: (item.iconColor ?? AppColors.primary).withAlpha(25),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(item.icon, color: item.iconColor ?? AppColors.primary, size: 20),

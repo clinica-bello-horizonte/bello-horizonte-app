@@ -14,6 +14,11 @@ class ApiEndpoints {
 
   // Users
   static const String userProfile = '/users/profile';
+  static const String fcmToken = '/users/fcm-token';
+
+  // Admin notifications
+  static const String adminNotificationUsers = '/admin/notifications/users';
+  static const String adminNotificationSend = '/admin/notifications/send';
 
   // Doctors
   static const String doctors = '/doctors';

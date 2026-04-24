@@ -43,13 +43,13 @@ class SpecialtyDetailPage extends ConsumerWidget {
                   background: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [specialty.color, specialty.color.withOpacity(0.7)],
+                        colors: [specialty.color, specialty.color.withAlpha(178)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                     ),
                     child: Center(
-                      child: Icon(specialty.iconData, size: 80, color: Colors.white.withOpacity(0.3)),
+                      child: Icon(specialty.iconData, size: 80, color: Colors.white.withAlpha(76)),
                     ),
                   ),
                 ),
@@ -63,9 +63,9 @@ class SpecialtyDetailPage extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: specialty.color.withOpacity(0.08),
+                          color: specialty.color.withAlpha(20),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: specialty.color.withOpacity(0.2)),
+                          border: Border.all(color: specialty.color.withAlpha(51)),
                         ),
                         child: Row(
                           children: [

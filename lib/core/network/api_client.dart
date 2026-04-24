@@ -90,7 +90,10 @@ class ApiClient {
     return null;
   }
 
-  dynamic _extractData(Response response) => response.data['data'];
+  dynamic _extractData(Response response) {
+    if (response.data is Map) return (response.data as Map)['data'];
+    return null;
+  }
 
   Future<dynamic> get(
     String path, {

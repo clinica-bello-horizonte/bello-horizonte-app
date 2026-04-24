@@ -40,7 +40,7 @@ class AppButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             minimumSize: Size(buttonWidth ?? 0, buttonHeight),
             backgroundColor: AppColors.primary,
-            disabledBackgroundColor: AppColors.primary.withOpacity(0.6),
+            disabledBackgroundColor: AppColors.primary.withAlpha(153),
           ),
           child: _buildChild(Colors.white),
         ),

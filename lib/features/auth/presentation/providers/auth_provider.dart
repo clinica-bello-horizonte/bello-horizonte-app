@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/services/fcm_service.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/user_entity.dart';
@@ -47,9 +51,21 @@ class AuthState {
 // Auth notifier
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
+  final ApiClient _api;
 
-  AuthNotifier(this._repository) : super(const AuthState(isLoading: true)) {
+  AuthNotifier(this._repository, this._api)
+      : super(const AuthState(isLoading: true)) {
     _init();
+  }
+
+  Future<void> _registerFcmToken() async {
+    final token = FcmService.instance.token;
+    if (token == null) return;
+    try {
+      await _api.patch(ApiEndpoints.fcmToken, body: {'token': token});
+    } catch (e) {
+      debugPrint('FCM token registration failed: $e');
+    }
   }
 
   Future<void> _init() async {
@@ -66,6 +82,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final user = await _repository.login(identifier: identifier, password: password);
       state = AuthState(user: user);
+      _registerFcmToken();
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: _mapError(e));
@@ -94,6 +111,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         birthDate: birthDate,
       );
       state = AuthState(user: user);
+      _registerFcmToken();
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: _mapError(e));
@@ -163,5 +181,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository);
+  final api = ref.watch(apiClientProvider);
+  return AuthNotifier(repository, api);
 });

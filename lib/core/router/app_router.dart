@@ -15,6 +15,9 @@ import '../../features/doctors/presentation/pages/doctor_edit_page.dart';
 import '../../features/doctors/presentation/pages/doctors_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/widgets/main_scaffold.dart';
+import '../../features/notifications/presentation/pages/admin_notifications_page.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/search/presentation/pages/search_page.dart';
 import '../../features/patient_history/presentation/pages/patient_history_page.dart';
 import '../../features/patient_history/presentation/pages/patient_record_detail_page.dart';
 import '../../features/settings/presentation/pages/edit_profile_page.dart';
@@ -64,6 +67,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/forgot-password',
         builder: (context, state) => const ForgotPasswordPage(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
+        path: '/admin/notifications',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AdminNotificationsPage(),
+      ),
+      GoRoute(
+        path: '/search',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SearchPage(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

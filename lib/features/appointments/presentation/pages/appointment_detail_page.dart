@@ -81,9 +81,9 @@ class AppointmentDetailPage extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: status.color.withOpacity(0.1),
+        color: status.color.withAlpha(25),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: status.color.withOpacity(0.3)),
+        border: Border.all(color: status.color.withAlpha(76)),
       ),
       child: Row(
         children: [
@@ -91,7 +91,7 @@ class AppointmentDetailPage extends ConsumerWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: status.color.withOpacity(0.2),
+              color: status.color.withAlpha(51),
               shape: BoxShape.circle,
             ),
             child: Icon(status.icon, color: status.color, size: 28),
@@ -173,7 +173,7 @@ class AppointmentDetailPage extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.infoLight,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.info.withOpacity(0.3)),
+        border: Border.all(color: AppColors.info.withAlpha(76)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

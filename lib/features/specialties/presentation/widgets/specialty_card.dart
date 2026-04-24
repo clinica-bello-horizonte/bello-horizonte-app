@@ -31,7 +31,7 @@ class SpecialtyCard extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: specialty.color.withOpacity(0.12),
+              color: specialty.color.withAlpha(30),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(specialty.iconData, color: specialty.color, size: 30),
@@ -65,7 +65,7 @@ class SpecialtyCard extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: specialty.color.withOpacity(0.08),
+              color: specialty.color.withAlpha(20),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -78,7 +78,7 @@ class SpecialtyCard extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: specialty.color.withOpacity(0.12),
+                color: specialty.color.withAlpha(30),
                 shape: BoxShape.circle,
               ),
               child: Icon(specialty.iconData, color: specialty.color, size: 28),

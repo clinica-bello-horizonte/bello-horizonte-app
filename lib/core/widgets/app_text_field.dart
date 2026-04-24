@@ -69,7 +69,7 @@ class _AppTextFieldState extends State<AppTextField> {
         Text(
           widget.label,
           style: AppTextStyles.labelLarge.copyWith(
-            color: AppColors.textDark,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -89,7 +89,9 @@ class _AppTextFieldState extends State<AppTextField> {
           maxLength: widget.maxLength,
           autofocus: widget.autofocus,
           focusNode: widget.focusNode,
-          style: AppTextStyles.bodyMedium,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon,
@@ -146,7 +148,9 @@ class AppDropdownField<T> extends StatelessWidget {
           onChanged: onChanged,
           validator: validator,
           hint: hint != null ? Text(hint!, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textLight)) : null,
-          style: AppTextStyles.bodyMedium,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textGray),
           decoration: const InputDecoration(),
           isExpanded: true,
