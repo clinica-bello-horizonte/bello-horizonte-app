@@ -1,8 +1,7 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  // Android emulator → host machine. Change to your server IP for real devices.
-  static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
+  static const String baseUrl = 'https://bello-horizonte-backend-production.up.railway.app/api/v1';
 
   // Auth
   static const String login = '/auth/login';
