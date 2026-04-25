@@ -75,11 +75,21 @@ class DoctorActionsNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<bool> completeAppointment(String id) async {
+  Future<bool> completeAppointment(
+    String id, {
+    String? diagnosis,
+    String? treatment,
+    String? notes,
+  }) async {
     state = const AsyncValue.loading();
     try {
       await _ref.read(apiClientProvider).patch(
         '${ApiEndpoints.doctorAppointments}/$id/complete',
+        body: {
+          if (diagnosis != null && diagnosis.isNotEmpty) 'diagnosis': diagnosis,
+          if (treatment != null && treatment.isNotEmpty) 'treatment': treatment,
+          if (notes != null && notes.isNotEmpty) 'notes': notes,
+        },
       );
       state = const AsyncValue.data(null);
       return true;

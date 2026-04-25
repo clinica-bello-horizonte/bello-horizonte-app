@@ -276,23 +276,77 @@ class _AppointmentDoctorCardState extends ConsumerState<_AppointmentDoctorCard> 
   }
 
   Future<void> _complete(AppointmentEntity apt) async {
-    final ok = await showDialog<bool>(
+    final diagnosisCtrl = TextEditingController();
+    final treatmentCtrl = TextEditingController();
+    final notesCtrl = TextEditingController();
+
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Completar cita'),
-        content: const Text('¿Marcar esta cita como completada?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Completar')),
-        ],
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Completar cita'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Paciente: ${apt.patientName ?? "—"}',
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textGray),
+                ),
+                const SizedBox(height: 16),
+                AppTextField(
+                  label: 'Diagnóstico *',
+                  hint: 'Ej: Hipertensión arterial leve, gastritis crónica...',
+                  controller: diagnosisCtrl,
+                  maxLines: 2,
+                  onChanged: (_) => setDialogState(() {}),
+                ),
+                const SizedBox(height: 12),
+                AppTextField(
+                  label: 'Tratamiento prescrito *',
+                  hint: 'Ej: Losartán 50mg 1 vez al día, dieta baja en sodio...',
+                  controller: treatmentCtrl,
+                  maxLines: 3,
+                  onChanged: (_) => setDialogState(() {}),
+                ),
+                const SizedBox(height: 12),
+                AppTextField(
+                  label: 'Notas clínicas (opcional)',
+                  hint: 'Observaciones adicionales, próxima cita...',
+                  controller: notesCtrl,
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: diagnosisCtrl.text.trim().isNotEmpty &&
+                      treatmentCtrl.text.trim().isNotEmpty
+                  ? () => Navigator.pop(ctx, true)
+                  : null,
+              child: const Text('Completar cita'),
+            ),
+          ],
+        ),
       ),
     );
-    if (ok != true || !mounted) return;
+    if (confirmed != true || !mounted) return;
 
-    final success = await ref.read(doctorActionsProvider.notifier).completeAppointment(apt.id);
+    final success = await ref.read(doctorActionsProvider.notifier).completeAppointment(
+          apt.id,
+          diagnosis: diagnosisCtrl.text.trim(),
+          treatment: treatmentCtrl.text.trim(),
+          notes: notesCtrl.text.trim().isEmpty ? null : notesCtrl.text.trim(),
+        );
     if (mounted) {
       if (success) {
-        context.showSuccessSnackBar('Cita completada');
+        context.showSuccessSnackBar('Cita completada y registro médico creado');
         ref.invalidate(doctorAgendaProvider);
       } else {
         context.showErrorSnackBar('Error al completar la cita');
