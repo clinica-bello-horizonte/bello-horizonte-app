@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -52,10 +54,21 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
   final ApiClient _api;
+  StreamSubscription<String>? _tokenSub;
 
   AuthNotifier(this._repository, this._api)
       : super(const AuthState(isLoading: true)) {
     _init();
+    // Re-registrar el token FCM en el backend cada vez que Firebase lo rote
+    _tokenSub = FcmService.instance.tokenUpdates.listen((_) {
+      if (state.isAuthenticated) _registerFcmToken();
+    });
+  }
+
+  @override
+  void dispose() {
+    _tokenSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _registerFcmToken() async {
@@ -72,6 +85,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final user = await _repository.getCurrentUser();
       state = AuthState(user: user, isLoading: false);
+      // Si ya hay sesión activa, re-registrar el token FCM (puede haber rotado)
+      if (user != null) {
+        Future.delayed(const Duration(seconds: 3), _registerFcmToken);
+      }
     } catch (_) {
       state = const AuthState(isLoading: false);
     }

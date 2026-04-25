@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -24,6 +25,9 @@ class FcmService {
   String? _token;
   String? get token => _token;
 
+  final _tokenController = StreamController<String>.broadcast();
+  Stream<String> get tokenUpdates => _tokenController.stream;
+
   Future<void> initialize() async {
     if (!Platform.isAndroid && !Platform.isIOS) return;
 
@@ -45,6 +49,7 @@ class FcmService {
 
     _fcm.onTokenRefresh.listen((newToken) {
       _token = newToken;
+      _tokenController.add(newToken); // notifica al AuthNotifier para re-registrar
     });
 
     // Show local notification when message arrives in foreground
