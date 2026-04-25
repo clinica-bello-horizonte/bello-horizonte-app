@@ -586,8 +586,8 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
     return SizedBox(
       height: 200,
       child: CalendarDatePicker(
-        initialDate: _selectedDate ?? now.add(const Duration(days: 1)),
-        firstDate: now.add(const Duration(days: 1)),
+        initialDate: _selectedDate ?? now,
+        firstDate: now,
         lastDate: now.add(const Duration(days: 90)),
         onDateChanged: (date) {
           final weekday = date.weekday - 1;

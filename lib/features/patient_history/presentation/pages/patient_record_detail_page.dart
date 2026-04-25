@@ -133,6 +133,7 @@ class PatientRecordDetailPage extends ConsumerWidget {
   }
 
   Future<void> _exportPdf(BuildContext context, dynamic record) async {
+    try {
     final pdf = pw.Document();
     pdf.addPage(
       pw.Page(
@@ -203,6 +204,13 @@ class PatientRecordDetailPage extends ConsumerWidget {
     );
 
     await Printing.sharePdf(bytes: await pdf.save(), filename: 'registro_medico_${record.recordDate ?? 'bh'}.pdf');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al generar PDF: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   pw.Widget _pdfRow(String label, String value) => pw.Padding(

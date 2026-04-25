@@ -23,8 +23,8 @@ class AppointmentsPage extends ConsumerStatefulWidget {
 class _AppointmentsPageState extends ConsumerState<AppointmentsPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  // Evitar mostrar el prompt más de una vez por sesión por cita
-  final _promptedIds = <String>{};
+  // Estático: persiste aunque el widget se recree al navegar entre tabs
+  static final _shownPrompts = <String>{};
   bool _promptScheduled = false;
 
   @override
@@ -43,8 +43,8 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage>
     if (_promptScheduled) return;
     // Buscar la primera cita completada cuya calificación no hayamos verificado
     for (final apt in completed) {
-      if (_promptedIds.contains(apt.id)) continue;
-      _promptedIds.add(apt.id);
+      if (_shownPrompts.contains(apt.id)) continue;
+      _shownPrompts.add(apt.id);
 
       // Verificar si ya tiene rating en el backend
       final existing = await ref.read(appointmentRatingProvider(apt.id).future);
