@@ -33,7 +33,7 @@ class _DoctorAgendaPageState extends ConsumerState<DoctorAgendaPage> {
         title: const Text('Mi Agenda'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.pop(),
+          onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
         ),
       ),
       body: Column(

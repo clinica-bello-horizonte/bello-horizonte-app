@@ -13,6 +13,7 @@ class DoctorModel extends DoctorEntity {
     super.consultationFee,
     super.availableDays,
     required super.createdAt,
+    super.userId,
   });
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +34,7 @@ class DoctorModel extends DoctorEntity {
       availableDays: days,
       createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
           DateTime.now(),
+      userId: json['userId'] as String?,
     );
   }
 

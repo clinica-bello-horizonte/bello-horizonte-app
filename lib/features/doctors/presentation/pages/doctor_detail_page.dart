@@ -10,6 +10,8 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/loading_overlay.dart';
 import '../../../appointments/presentation/providers/appointments_provider.dart';
+import '../../../auth/domain/entities/user_entity.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../specialties/presentation/providers/specialties_provider.dart';
 import '../providers/doctors_provider.dart';
 
@@ -33,6 +35,12 @@ class DoctorDetailPage extends ConsumerWidget {
         final specialty = specialtiesAsync.valueOrNull?.where((s) => s.id == doctor.specialtyId).firstOrNull;
         const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
+        final currentUser = ref.watch(authStateProvider).user;
+        final isAdmin = currentUser?.role == UserRole.admin;
+        final isOwnProfile = currentUser?.role == UserRole.doctor &&
+            doctor.userId != null &&
+            doctor.userId == currentUser?.id;
+
         return Scaffold(
           body: CustomScrollView(
             slivers: [
@@ -44,6 +52,20 @@ class DoctorDetailPage extends ConsumerWidget {
                   icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
                   onPressed: () => context.pop(),
                 ),
+                actions: [
+                  if (isAdmin)
+                    IconButton(
+                      icon: const Icon(Icons.edit_rounded, color: Colors.white),
+                      tooltip: 'Editar médico',
+                      onPressed: () => context.push('/doctors/${doctor.id}/edit'),
+                    ),
+                  if (isOwnProfile)
+                    IconButton(
+                      icon: const Icon(Icons.manage_accounts_rounded, color: Colors.white),
+                      tooltip: 'Editar mi perfil',
+                      onPressed: () => context.push('/doctor/profile/edit'),
+                    ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
                     decoration: const BoxDecoration(

@@ -12,6 +12,7 @@ class DoctorEntity extends Equatable {
   final double consultationFee;
   final List<int> availableDays;
   final DateTime createdAt;
+  final String? userId;
 
   const DoctorEntity({
     required this.id,
@@ -25,6 +26,7 @@ class DoctorEntity extends Equatable {
     this.consultationFee = 0,
     this.availableDays = const [],
     required this.createdAt,
+    this.userId,
   });
 
   String get fullName => 'Dr. $firstName $lastName';

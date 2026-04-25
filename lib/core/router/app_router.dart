@@ -13,6 +13,7 @@ import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/admin/presentation/pages/admin_doctor_appointments_page.dart';
 import '../../features/doctor/presentation/pages/doctor_agenda_page.dart';
+import '../../features/doctor/presentation/pages/doctor_profile_edit_page.dart';
 import '../../features/doctors/presentation/pages/doctor_detail_page.dart';
 import '../../features/doctors/presentation/pages/doctor_edit_page.dart';
 import '../../features/doctors/presentation/pages/doctors_page.dart';
@@ -43,17 +44,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isInitializing = authState.isLoading;
       final location = state.matchedLocation;
 
-      if (isInitializing) return location == '/' ? null : '/';
+      final isOnAuthRoute = location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password' ||
+          location == '/onboarding';
+
+      // Solo redirigir al splash durante el arranque inicial,
+      // no durante acciones de login/registro que también ponen isLoading=true
+      if (isInitializing) {
+        if (location == '/') return null;
+        if (isOnAuthRoute) return null; // no interrumpir login/register en curso
+        return '/';
+      }
       if (location == '/') {
         if (isAuthenticated) return '/home';
         final onboardingDone = ref.read(onboardingDoneSyncProvider);
         return onboardingDone ? '/login' : '/onboarding';
       }
-
-      final isOnAuthRoute = location == '/login' ||
-          location == '/register' ||
-          location == '/forgot-password' ||
-          location == '/onboarding';
 
       if (!isAuthenticated && !isOnAuthRoute) return '/login';
       if (isAuthenticated && isOnAuthRoute) return '/home';
@@ -93,6 +100,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/doctor/agenda',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const DoctorAgendaPage(),
+      ),
+      GoRoute(
+        path: '/doctor/profile/edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const DoctorProfileEditPage(),
       ),
       GoRoute(
         path: '/admin/doctors/:id/appointments',
