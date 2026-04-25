@@ -94,10 +94,10 @@ class AppointmentsNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<bool> cancelAppointment(String id) async {
+  Future<bool> cancelAppointment(String id, {String? reason}) async {
     state = const AsyncLoading();
     try {
-      await _repo.cancelAppointment(id);
+      await _repo.cancelAppointment(id, reason: reason);
       state = const AsyncData(null);
       _ref.invalidate(appointmentsProvider);
       _ref.invalidate(upcomingAppointmentsProvider);

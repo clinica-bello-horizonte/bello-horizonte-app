@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/domain/entities/user_entity.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 class MainScaffold extends ConsumerWidget {
   final Widget child;
   const MainScaffold({super.key, required this.child});
 
-  static const _tabs = [
+  static const _userTabs = [
     _TabItem(icon: Icons.home_rounded, outlinedIcon: Icons.home_outlined, label: 'Inicio', path: '/home'),
     _TabItem(icon: Icons.calendar_month_rounded, outlinedIcon: Icons.calendar_month_outlined, label: 'Citas', path: '/appointments'),
     _TabItem(icon: Icons.people_rounded, outlinedIcon: Icons.people_outline_rounded, label: 'Médicos', path: '/doctors'),
@@ -18,17 +19,27 @@ class MainScaffold extends ConsumerWidget {
     _TabItem(icon: Icons.person_rounded, outlinedIcon: Icons.person_outline_rounded, label: 'Perfil', path: '/settings'),
   ];
 
-  int _currentIndex(BuildContext context) {
+  static const _doctorTabs = [
+    _TabItem(icon: Icons.home_rounded, outlinedIcon: Icons.home_outlined, label: 'Inicio', path: '/home'),
+    _TabItem(icon: Icons.calendar_today_rounded, outlinedIcon: Icons.calendar_today_outlined, label: 'Agenda', path: '/doctor/agenda'),
+    _TabItem(icon: Icons.people_rounded, outlinedIcon: Icons.people_outline_rounded, label: 'Médicos', path: '/doctors'),
+    _TabItem(icon: Icons.person_rounded, outlinedIcon: Icons.person_outline_rounded, label: 'Perfil', path: '/settings'),
+  ];
+
+  int _currentIndex(BuildContext context, List<_TabItem> tabs) {
     final location = GoRouterState.of(context).matchedLocation;
-    for (int i = 0; i < _tabs.length; i++) {
-      if (location.startsWith(_tabs[i].path)) return i;
+    for (int i = 0; i < tabs.length; i++) {
+      if (location.startsWith(tabs[i].path)) return i;
     }
     return 0;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = _currentIndex(context);
+    final user = ref.watch(authStateProvider).user;
+    final isDoctor = user?.role == UserRole.doctor;
+    final tabs = isDoctor ? _doctorTabs : _userTabs;
+    final currentIndex = _currentIndex(context, tabs);
 
     return Scaffold(
       body: child,
@@ -36,11 +47,7 @@ class MainScaffold extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(18),
-              blurRadius: 16,
-              offset: const Offset(0, -2),
-            ),
+            BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 16, offset: const Offset(0, -2)),
           ],
         ),
         child: SafeArea(
@@ -48,8 +55,8 @@ class MainScaffold extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(_tabs.length, (i) {
-                final tab = _tabs[i];
+              children: List.generate(tabs.length, (i) {
+                final tab = tabs[i];
                 final isSelected = i == currentIndex;
                 return _NavItem(
                   icon: isSelected ? tab.icon : tab.outlinedIcon,
@@ -80,12 +87,7 @@ class _NavItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const _NavItem({required this.icon, required this.label, required this.isSelected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +107,7 @@ class _NavItem extends StatelessWidget {
                 color: isSelected ? AppColors.primaryContainer : Colors.transparent,
                 borderRadius: BorderRadius.circular(22),
               ),
-              child: Icon(
-                icon,
-                size: 22,
-                color: isSelected ? AppColors.primary : AppColors.textLight,
-              ),
+              child: Icon(icon, size: 22, color: isSelected ? AppColors.primary : AppColors.textLight),
             ),
             const SizedBox(height: 3),
             Text(

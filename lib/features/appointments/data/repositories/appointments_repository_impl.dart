@@ -34,7 +34,8 @@ class AppointmentsRepositoryImpl implements AppointmentsRepository {
   }
 
   @override
-  Future<void> cancelAppointment(String id) => _datasource.cancel(id);
+  Future<void> cancelAppointment(String id, {String? reason}) =>
+      _datasource.cancel(id, reason: reason);
 
   @override
   Future<void> rescheduleAppointment(

@@ -124,4 +124,21 @@ class ApiClient {
       throw _mapError(e);
     }
   }
+
+  Future<dynamic> uploadFile(
+    String path,
+    List<int> bytes, {
+    required String filename,
+    required String mimeType,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': MultipartFile.fromBytes(bytes, filename: filename),
+      });
+      final res = await _dio.post(path, data: formData);
+      return _extractData(res);
+    } on DioException catch (e) {
+      throw _mapError(e);
+    }
+  }
 }

@@ -5,7 +5,7 @@ abstract class AppointmentsRepository {
   Future<List<AppointmentEntity>> getUpcomingAppointments(String userId);
   Future<AppointmentEntity?> getAppointmentById(String id);
   Future<AppointmentEntity> createAppointment(AppointmentEntity appointment);
-  Future<void> cancelAppointment(String id);
+  Future<void> cancelAppointment(String id, {String? reason});
   Future<void> rescheduleAppointment(String id, DateTime newDate, String newTime);
   Future<List<String>> getBookedSlots(String doctorId, DateTime date);
 }

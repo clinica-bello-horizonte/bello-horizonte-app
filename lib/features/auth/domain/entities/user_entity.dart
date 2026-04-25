@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum UserRole { admin, user }
+enum UserRole { admin, doctor, user }
 
 class UserEntity extends Equatable {
   final String id;
@@ -12,6 +12,7 @@ class UserEntity extends Equatable {
   final String? birthDate;
   final DateTime createdAt;
   final UserRole role;
+  final String? photoUrl;
 
   const UserEntity({
     required this.id,
@@ -23,10 +24,12 @@ class UserEntity extends Equatable {
     this.birthDate,
     required this.createdAt,
     this.role = UserRole.user,
+    this.photoUrl,
   });
 
   String get fullName => '$firstName $lastName';
   bool get isAdmin => role == UserRole.admin;
+  bool get isDoctor => role == UserRole.doctor;
 
   String get initials {
     final f = firstName.isNotEmpty ? firstName[0].toUpperCase() : '';
@@ -44,6 +47,7 @@ class UserEntity extends Equatable {
     String? birthDate,
     DateTime? createdAt,
     UserRole? role,
+    String? photoUrl,
   }) {
     return UserEntity(
       id: id ?? this.id,
@@ -55,9 +59,10 @@ class UserEntity extends Equatable {
       birthDate: birthDate ?? this.birthDate,
       createdAt: createdAt ?? this.createdAt,
       role: role ?? this.role,
+      photoUrl: photoUrl ?? this.photoUrl,
     );
   }
 
   @override
-  List<Object?> get props => [id, dni, email, phone, firstName, lastName, birthDate, createdAt, role];
+  List<Object?> get props => [id, dni, email, phone, firstName, lastName, birthDate, createdAt, role, photoUrl];
 }

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/network/api_endpoints.dart';
+import '../../../../core/providers/core_providers.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/date_formatter.dart';
@@ -45,6 +47,20 @@ class AppointmentDetailPage extends ConsumerWidget {
                 _buildInfoCard(context, appointment),
                 const SizedBox(height: 16),
                 if (appointment.reason != null) _buildReasonCard(appointment),
+                if (appointment.cancelReason != null) ...[
+                  const SizedBox(height: 16),
+                  _buildInfoRow(Icons.cancel_rounded, 'Motivo de cancelación', appointment.cancelReason!, Colors.red),
+                ],
+                if (appointment.postponeReason != null) ...[
+                  const SizedBox(height: 16),
+                  _buildInfoRow(Icons.schedule_rounded, 'Motivo de postergación', appointment.postponeReason!, const Color(0xFFF59E0B)),
+                  if (appointment.newDate != null)
+                    _buildInfoRow(Icons.event_rounded, 'Nueva fecha', '${appointment.newDate} ${appointment.newTime ?? ''}', AppColors.primary),
+                ],
+                if (appointment.isRatable) ...[
+                  const SizedBox(height: 24),
+                  _RatingWidget(appointmentId: appointment.id, doctorId: appointment.doctorId),
+                ],
                 const SizedBox(height: 24),
                 if (appointment.isCancellable) ...[
                   AppButton(
@@ -143,17 +159,18 @@ class AppointmentDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(IconData icon, String label, String value, [Color? iconColor]) {
+    final color = iconColor ?? AppColors.primary;
     return Row(
       children: [
         Container(
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primaryContainer,
+            color: color.withAlpha(25),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 18, color: AppColors.primary),
+          child: Icon(icon, size: 18, color: color),
         ),
         const SizedBox(width: 12),
         Column(
@@ -197,24 +214,161 @@ class AppointmentDetailPage extends ConsumerWidget {
   }
 
   Future<void> _cancelAppointment(BuildContext context, WidgetRef ref, AppointmentEntity appointment) async {
-    final confirm = await context.showConfirmDialog(
-      title: 'Cancelar cita',
-      message: '¿Estás seguro de que deseas cancelar esta cita? Esta acción no se puede deshacer.',
-      confirmText: 'Cancelar cita',
-      cancelText: 'No, mantener',
-      isDangerous: true,
+    final reasonController = TextEditingController();
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancelar cita'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('¿Por qué deseas cancelar esta cita?'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Motivo de cancelación (obligatorio)...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Volver')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Cancelar cita', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
 
-    if (confirm == true) {
-      final success = await ref.read(appointmentsNotifierProvider.notifier).cancelAppointment(appointment.id);
-      if (context.mounted) {
-        if (success) {
-          context.showSuccessSnackBar('Cita cancelada exitosamente');
-          context.pop();
-        } else {
-          context.showErrorSnackBar('Error al cancelar la cita');
-        }
+    if (confirm != true || !context.mounted) return;
+
+    final reason = reasonController.text.trim();
+    if (reason.length < 5) {
+      context.showErrorSnackBar('El motivo debe tener al menos 5 caracteres');
+      return;
+    }
+
+    final success = await ref
+        .read(appointmentsNotifierProvider.notifier)
+        .cancelAppointment(appointment.id, reason: reason);
+    if (context.mounted) {
+      if (success) {
+        context.showSuccessSnackBar('Cita cancelada exitosamente');
+        context.pop();
+      } else {
+        context.showErrorSnackBar('Error al cancelar. Recuerda que no puedes cancelar con menos de 2 horas de anticipación.');
       }
     }
+  }
+}
+
+// ─── Rating Widget ────────────────────────────────────────────────────────────
+
+final _ratingExistsProvider = FutureProvider.autoDispose
+    .family<bool, String>((ref, appointmentId) async {
+  final api = ref.watch(apiClientProvider);
+  final data = await api.get(ApiEndpoints.getAppointmentRating(appointmentId));
+  return data != null;
+});
+
+class _RatingWidget extends ConsumerStatefulWidget {
+  final String appointmentId;
+  final String doctorId;
+  const _RatingWidget({required this.appointmentId, required this.doctorId});
+
+  @override
+  ConsumerState<_RatingWidget> createState() => _RatingWidgetState();
+}
+
+class _RatingWidgetState extends ConsumerState<_RatingWidget> {
+  int _stars = 0;
+  bool _submitted = false;
+  bool _loading = false;
+
+  Future<void> _submit() async {
+    if (_stars == 0) return;
+    setState(() => _loading = true);
+    try {
+      await ref.read(apiClientProvider).post(
+        ApiEndpoints.rateAppointment(widget.appointmentId),
+        body: {'stars': _stars},
+      );
+      setState(() { _submitted = true; _loading = false; });
+      if (mounted) context.showSuccessSnackBar('¡Gracias por tu calificación!');
+    } catch (_) {
+      setState(() => _loading = false);
+      if (mounted) context.showErrorSnackBar('Error al enviar la calificación');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final existsAsync = ref.watch(_ratingExistsProvider(widget.appointmentId));
+
+    return existsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (alreadyRated) {
+        if (alreadyRated || _submitted) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.star_rounded, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Text('Ya calificaste esta cita', style: AppTextStyles.bodyMedium),
+              ],
+            ),
+          );
+        }
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Theme.of(context).dividerColor),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Califica tu consulta', style: AppTextStyles.h4),
+              const SizedBox(height: 4),
+              Text('¿Cómo fue tu experiencia?', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textGray)),
+              const SizedBox(height: 12),
+              Row(
+                children: List.generate(5, (i) => GestureDetector(
+                  onTap: () => setState(() => _stars = i + 1),
+                  child: Icon(
+                    i < _stars ? Icons.star_rounded : Icons.star_border_rounded,
+                    size: 36,
+                    color: const Color(0xFFFFC107),
+                  ),
+                )),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _stars > 0 && !_loading ? _submit : null,
+                  child: _loading
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Text('Enviar calificación'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

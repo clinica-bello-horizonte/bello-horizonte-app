@@ -25,6 +25,7 @@ class RoleGuard extends ConsumerWidget {
 
     final allowed = switch (requiredRole) {
       UserRole.admin => user.isAdmin,
+      UserRole.doctor => user.isDoctor,
       UserRole.user => true,
     };
 

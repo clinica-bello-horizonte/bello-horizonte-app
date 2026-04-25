@@ -14,6 +14,7 @@ class UserModel extends UserEntity {
     required super.createdAt,
     required this.passwordHash,
     super.role = UserRole.user,
+    super.photoUrl,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +29,7 @@ class UserModel extends UserEntity {
       birthDate: json['birthDate'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       passwordHash: '',
+      photoUrl: json['photoUrl'] as String?,
       role: UserRole.values.firstWhere(
         (r) => r.name == roleStr,
         orElse: () => UserRole.user,

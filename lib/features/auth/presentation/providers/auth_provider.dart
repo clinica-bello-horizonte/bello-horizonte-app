@@ -170,6 +170,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void clearError() => state = state.copyWith(clearError: true);
 
+  void updatePhotoUrl(String? url) {
+    if (state.user == null) return;
+    state = state.copyWith(user: state.user!.copyWith(photoUrl: url));
+  }
+
   String _mapError(Object e) {
     final msg = e.toString();
     if (msg.contains('Credenciales')) return 'DNI/correo o contraseña incorrectos';

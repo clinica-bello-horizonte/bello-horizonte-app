@@ -38,4 +38,19 @@ class ApiEndpoints {
   // Patient records
   static const String patientRecords = '/patient-records';
   static String patientRecordById(String id) => '/patient-records/$id';
+
+  // Doctor (rol médico)
+  static const String doctorAgenda = '/doctor/agenda';
+  static const String doctorProfile = '/doctor/profile';
+  static const String doctorAppointments = '/doctor/appointments';
+
+  // Ratings
+  static String rateAppointment(String id) => '/ratings/appointments/$id';
+  static String getAppointmentRating(String id) => '/ratings/appointments/$id';
+
+  // Upload
+  static const String uploadAvatar = '/upload/avatar';
+
+  // Admin appointments
+  static String adminAppointmentsByDoctor(String doctorId) => '/admin/appointments/by-doctor/$doctorId';
 }

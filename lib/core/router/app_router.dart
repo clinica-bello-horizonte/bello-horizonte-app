@@ -5,11 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../features/appointments/presentation/pages/appointment_detail_page.dart';
 import '../../features/appointments/presentation/pages/appointments_page.dart';
 import '../../features/appointments/presentation/pages/create_appointment_page.dart';
+import '../../features/auth/domain/entities/user_entity.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/admin/presentation/pages/admin_doctor_appointments_page.dart';
+import '../../features/doctor/presentation/pages/doctor_agenda_page.dart';
 import '../../features/doctors/presentation/pages/doctor_detail_page.dart';
 import '../../features/doctors/presentation/pages/doctor_edit_page.dart';
 import '../../features/doctors/presentation/pages/doctors_page.dart';
@@ -17,6 +20,7 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/widgets/main_scaffold.dart';
 import '../../features/notifications/presentation/pages/admin_notifications_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/search/presentation/pages/search_page.dart';
 import '../../features/patient_history/presentation/pages/patient_history_page.dart';
 import '../../features/patient_history/presentation/pages/patient_record_detail_page.dart';
@@ -44,30 +48,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final isOnAuthRoute = location == '/login' ||
           location == '/register' ||
-          location == '/forgot-password';
+          location == '/forgot-password' ||
+          location == '/onboarding';
 
       if (!isAuthenticated && !isOnAuthRoute) return '/login';
       if (isAuthenticated && isOnAuthRoute) return '/home';
 
+      // Doctor only routes
+      if (location.startsWith('/doctor') && authState.user?.role != UserRole.doctor) {
+        return '/home';
+      }
+
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const SplashPage(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const SplashPage()),
       GoRoute(
         path: '/login',
         pageBuilder: (context, state) => const NoTransitionPage(child: LoginPage()),
       ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordPage(),
-      ),
+      GoRoute(path: '/register', builder: (context, state) => const RegisterPage()),
+      GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordPage()),
+      GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingPage()),
       GoRoute(
         path: '/notifications',
         parentNavigatorKey: _rootNavigatorKey,
@@ -82,6 +84,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/search',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const SearchPage(),
+      ),
+      GoRoute(
+        path: '/doctor/agenda',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const DoctorAgendaPage(),
+      ),
+      GoRoute(
+        path: '/admin/doctors/:id/appointments',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final doctor = state.extra;
+          return AdminDoctorAppointmentsPage(doctor: doctor as dynamic);
+        },
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -123,16 +138,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':id',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => DoctorDetailPage(
-                  doctorId: state.pathParameters['id']!,
-                ),
+                builder: (context, state) => DoctorDetailPage(doctorId: state.pathParameters['id']!),
                 routes: [
                   GoRoute(
                     path: 'edit',
                     parentNavigatorKey: _rootNavigatorKey,
-                    builder: (context, state) => DoctorEditPage(
-                      doctorId: state.pathParameters['id']!,
-                    ),
+                    builder: (context, state) => DoctorEditPage(doctorId: state.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -145,9 +156,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':id',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => SpecialtyDetailPage(
-                  specialtyId: state.pathParameters['id']!,
-                ),
+                builder: (context, state) => SpecialtyDetailPage(specialtyId: state.pathParameters['id']!),
               ),
             ],
           ),
@@ -158,9 +167,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':id',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => PatientRecordDetailPage(
-                  recordId: state.pathParameters['id']!,
-                ),
+                builder: (context, state) => PatientRecordDetailPage(recordId: state.pathParameters['id']!),
               ),
             ],
           ),
@@ -187,10 +194,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             const SizedBox(height: 16),
             Text('Página no encontrada', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => context.go('/home'),
-              child: const Text('Ir al inicio'),
-            ),
+            TextButton(onPressed: () => context.go('/home'), child: const Text('Ir al inicio')),
           ],
         ),
       ),
@@ -198,6 +202,5 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 
   ref.listen<AuthState>(authStateProvider, (_, __) => router.refresh());
-
   return router;
 });

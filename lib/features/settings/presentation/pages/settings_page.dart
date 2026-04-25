@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/upload_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -32,29 +33,79 @@ class SettingsPage extends ConsumerWidget {
               color: Theme.of(context).cardColor,
               child: Column(
                 children: [
-                  Container(
-                    width: 86,
-                    height: 86,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primary, AppColors.primaryDark],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withAlpha(76),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
+                  GestureDetector(
+                    onTap: () async {
+                      final url = await ref.read(uploadProvider.notifier).pickAndUpload();
+                      if (url == null && context.mounted) {
+                        final err = ref.read(uploadProvider).hasError;
+                        if (err) context.showErrorSnackBar('Error al subir la foto');
+                      }
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 86,
+                          height: 86,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.primary, AppColors.primaryDark],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withAlpha(76),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            image: user?.photoUrl != null
+                                ? DecorationImage(
+                                    image: NetworkImage(user!.photoUrl!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                          child: user?.photoUrl == null
+                              ? Center(
+                                  child: Text(
+                                    user?.initials ?? 'U',
+                                    style: AppTextStyles.displayMedium.copyWith(color: Colors.white, fontSize: 30),
+                                  ),
+                                )
+                              : null,
                         ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Theme.of(context).cardColor, width: 2),
+                            ),
+                            child: const Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
+                          ),
+                        ),
+                        if (ref.watch(uploadProvider).isLoading)
+                          Positioned.fill(
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.black38,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 20, height: 20,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        user?.initials ?? 'U',
-                        style: AppTextStyles.displayMedium.copyWith(color: Colors.white, fontSize: 30),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 14),

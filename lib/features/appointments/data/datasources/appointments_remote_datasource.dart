@@ -49,8 +49,11 @@ class AppointmentsRemoteDatasource {
     return AppointmentModel.fromJson(data);
   }
 
-  Future<void> cancel(String id) async {
-    await _api.patch(ApiEndpoints.cancelAppointment(id));
+  Future<void> cancel(String id, {String? reason}) async {
+    await _api.patch(
+      ApiEndpoints.cancelAppointment(id),
+      body: reason != null ? {'reason': reason} : null,
+    );
   }
 
   Future<void> reschedule(

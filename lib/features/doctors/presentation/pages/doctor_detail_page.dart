@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:intl/intl.dart';
+
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/loading_overlay.dart';
+import '../../../appointments/presentation/providers/appointments_provider.dart';
 import '../../../specialties/presentation/providers/specialties_provider.dart';
 import '../providers/doctors_provider.dart';
 
@@ -102,6 +106,12 @@ class DoctorDetailPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 24),
 
+                      // Próximas fechas disponibles
+                      Text('Próximas fechas disponibles', style: AppTextStyles.h3),
+                      const SizedBox(height: 12),
+                      _NextAvailableDates(doctor: doctor),
+                      const SizedBox(height: 24),
+
                       // Schedule
                       Text('Días de atención', style: AppTextStyles.h3),
                       const SizedBox(height: 12),
@@ -185,6 +195,97 @@ class DoctorDetailPage extends ConsumerWidget {
           const SizedBox(height: 2),
           Text(label, style: AppTextStyles.caption, textAlign: TextAlign.center),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Próximas fechas disponibles ─────────────────────────────────────────────
+
+class _NextAvailableDates extends ConsumerWidget {
+  final dynamic doctor;
+  const _NextAvailableDates({required this.doctor});
+
+  List<DateTime> _getNextDates() {
+    final now = DateTime.now();
+    final List<DateTime> dates = [];
+    var day = now.add(const Duration(days: 1));
+    while (dates.length < 5) {
+      // availableDays usa 1=Lun…6=Sab, DateTime.weekday usa 1=Lun…7=Dom
+      final weekday = day.weekday; // 1-7
+      if ((doctor.availableDays as List<int>).contains(weekday)) {
+        dates.add(day);
+      }
+      day = day.add(const Duration(days: 1));
+    }
+    return dates;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dates = _getNextDates();
+
+    return SizedBox(
+      height: 72,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: dates.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (ctx, i) {
+          final date = dates[i];
+          final bookedAsync = ref.watch(
+            bookedSlotsProvider((doctorId: doctor.id, date: date)),
+          );
+          final booked = bookedAsync.valueOrNull ?? [];
+          final freeSlots = AppConstants.timeSlots.length - booked.length;
+
+          return GestureDetector(
+            onTap: () => context.push(
+              '/appointments/create',
+              extra: {'specialtyId': doctor.specialtyId, 'doctorId': doctor.id},
+            ),
+            child: Container(
+              width: 90,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: freeSlots > 0
+                    ? AppColors.primaryContainer
+                    : AppColors.surfaceVariantLight,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: freeSlots > 0 ? AppColors.primary.withAlpha(80) : AppColors.border,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    DateFormat('EEE', 'es').format(date),
+                    style: AppTextStyles.caption.copyWith(
+                      color: freeSlots > 0 ? AppColors.primary : AppColors.textGray,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    DateFormat('d MMM', 'es').format(date),
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: freeSlots > 0 ? AppColors.textDark : AppColors.textGray,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    freeSlots > 0 ? '$freeSlots libres' : 'Lleno',
+                    style: AppTextStyles.caption.copyWith(
+                      color: freeSlots > 0 ? AppColors.success : AppColors.error,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

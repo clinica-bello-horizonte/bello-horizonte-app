@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../onboarding/presentation/pages/onboarding_page.dart';
 import '../providers/auth_provider.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -45,13 +46,16 @@ class _SplashPageState extends ConsumerState<SplashPage>
   Widget build(BuildContext context) {
     ref.listen<AuthState>(authStateProvider, (prev, next) {
       if (!next.isLoading) {
-        Future.delayed(const Duration(milliseconds: 800), () {
+        final router = GoRouter.of(context);
+        Future.delayed(const Duration(milliseconds: 800), () async {
           if (!mounted) return;
           if (next.isAuthenticated) {
-            context.go('/home');
-          } else {
-            context.go('/login');
+            router.go('/home');
+            return;
           }
+          final done = await ref.read(onboardingDoneProvider.future);
+          if (!mounted) return;
+          router.go(done ? '/login' : '/onboarding');
         });
       }
     });

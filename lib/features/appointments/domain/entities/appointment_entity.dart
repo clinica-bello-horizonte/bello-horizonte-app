@@ -8,7 +8,8 @@ enum AppointmentStatus {
   confirmed,
   cancelled,
   completed,
-  rescheduled;
+  rescheduled,
+  postponed;
 
   String get label => switch (this) {
         pending => 'Pendiente',
@@ -16,6 +17,7 @@ enum AppointmentStatus {
         cancelled => 'Cancelada',
         completed => 'Completada',
         rescheduled => 'Reprogramada',
+        postponed => 'Postergada',
       };
 
   Color get color => switch (this) {
@@ -24,6 +26,7 @@ enum AppointmentStatus {
         cancelled => AppColors.statusCancelled,
         completed => AppColors.statusCompleted,
         rescheduled => AppColors.statusRescheduled,
+        postponed => const Color(0xFFF59E0B),
       };
 
   IconData get icon => switch (this) {
@@ -32,6 +35,7 @@ enum AppointmentStatus {
         cancelled => Icons.cancel_rounded,
         completed => Icons.done_all_rounded,
         rescheduled => Icons.update_rounded,
+        postponed => Icons.schedule_rounded,
       };
 }
 
@@ -45,11 +49,18 @@ class AppointmentEntity extends Equatable {
   final AppointmentStatus status;
   final String? reason;
   final String? notes;
+  final String? cancelReason;
+  final String? postponeReason;
+  final String? newDate;
+  final String? newTime;
   final DateTime createdAt;
 
-  // Joined data (from queries)
+  // Joined data
   final String? doctorName;
   final String? specialtyName;
+  final String? patientName;
+  final String? patientPhone;
+  final String? patientPhotoUrl;
 
   const AppointmentEntity({
     required this.id,
@@ -61,9 +72,16 @@ class AppointmentEntity extends Equatable {
     required this.status,
     this.reason,
     this.notes,
+    this.cancelReason,
+    this.postponeReason,
+    this.newDate,
+    this.newTime,
     required this.createdAt,
     this.doctorName,
     this.specialtyName,
+    this.patientName,
+    this.patientPhone,
+    this.patientPhotoUrl,
   });
 
   bool get isUpcoming =>
@@ -73,16 +91,20 @@ class AppointmentEntity extends Equatable {
           appointmentDate.year == DateTime.now().year);
 
   bool get isPast => !isUpcoming;
-  bool get isCancellable => status == AppointmentStatus.pending ||
-      status == AppointmentStatus.confirmed ||
-      status == AppointmentStatus.rescheduled;
+  bool get isCancellable =>
+      status == AppointmentStatus.pending || status == AppointmentStatus.confirmed;
   bool get isReschedulable => isCancellable;
+  bool get isPostponable => isCancellable;
+  bool get isCompletable => status == AppointmentStatus.confirmed;
+  bool get isRatable => status == AppointmentStatus.completed;
 
   AppointmentEntity copyWith({
     AppointmentStatus? status,
     DateTime? appointmentDate,
     String? appointmentTime,
     String? notes,
+    String? cancelReason,
+    String? postponeReason,
   }) {
     return AppointmentEntity(
       id: id,
@@ -94,9 +116,16 @@ class AppointmentEntity extends Equatable {
       status: status ?? this.status,
       reason: reason,
       notes: notes ?? this.notes,
+      cancelReason: cancelReason ?? this.cancelReason,
+      postponeReason: postponeReason ?? this.postponeReason,
+      newDate: newDate,
+      newTime: newTime,
       createdAt: createdAt,
       doctorName: doctorName,
       specialtyName: specialtyName,
+      patientName: patientName,
+      patientPhone: patientPhone,
+      patientPhotoUrl: patientPhotoUrl,
     );
   }
 
