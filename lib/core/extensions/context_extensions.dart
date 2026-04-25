@@ -13,18 +13,64 @@ extension ContextExtensions on BuildContext {
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
 
   void showSnackBar(String message, {bool isError = false, bool isSuccess = false}) {
+    final Color accent;
+    final Color bg;
+    final IconData icon;
+
+    if (isError) {
+      accent = const Color(0xFFC62828);
+      bg    = const Color(0xFFFFF5F5);
+      icon  = Icons.error_outline_rounded;
+    } else if (isSuccess) {
+      accent = const Color(0xFF2E7D32);
+      bg    = const Color(0xFFF1FBF1);
+      icon  = Icons.check_circle_outline_rounded;
+    } else {
+      accent = const Color(0xFF1565C0);
+      bg    = const Color(0xFFF0F4FF);
+      icon  = Icons.info_outline_rounded;
+    }
+
     ScaffoldMessenger.of(this).hideCurrentSnackBar();
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: isError
-            ? Theme.of(this).colorScheme.error
-            : isSuccess
-                ? Colors.green.shade700
-                : null,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding + 12),
+        duration: Duration(seconds: isError ? 4 : 3),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: accent.withAlpha(60), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(18),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: accent, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    color: accent.withAlpha(230),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
