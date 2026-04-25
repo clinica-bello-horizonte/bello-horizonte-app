@@ -9,6 +9,10 @@ import '../../../../core/widgets/app_button.dart';
 
 const _kOnboardingKey = 'onboarding_done';
 
+/// Loaded synchronously in main() before runApp — overridden via ProviderScope.
+final onboardingDoneSyncProvider = Provider<bool>((ref) => false);
+
+/// Kept for legacy use; prefer onboardingDoneSyncProvider in the router.
 final onboardingDoneProvider = FutureProvider<bool>((ref) async {
   const storage = FlutterSecureStorage();
   final val = await storage.read(key: _kOnboardingKey);
@@ -48,7 +52,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     _Slide(
       icon: Icons.history_rounded,
       color: Color(0xFFE65100),
-      title: 'Tu historial\nsempre contigo',
+      title: 'Tu historial\nsiempre contigo',
       subtitle: 'Accede a diagnósticos, tratamientos y registros médicos en cualquier momento.',
     ),
   ];

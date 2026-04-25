@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../onboarding/presentation/pages/onboarding_page.dart';
-import '../providers/auth_provider.dart';
 
-class SplashPage extends ConsumerStatefulWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  ConsumerState<SplashPage> createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends ConsumerState<SplashPage>
+class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
@@ -44,22 +40,6 @@ class _SplashPageState extends ConsumerState<SplashPage>
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AuthState>(authStateProvider, (prev, next) {
-      if (!next.isLoading) {
-        final router = GoRouter.of(context);
-        Future.delayed(const Duration(milliseconds: 800), () async {
-          if (!mounted) return;
-          if (next.isAuthenticated) {
-            router.go('/home');
-            return;
-          }
-          final done = await ref.read(onboardingDoneProvider.future);
-          if (!mounted) return;
-          router.go(done ? '/login' : '/onboarding');
-        });
-      }
-    });
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(

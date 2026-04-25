@@ -20,7 +20,7 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/widgets/main_scaffold.dart';
 import '../../features/notifications/presentation/pages/admin_notifications_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
-import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart' show OnboardingPage, onboardingDoneSyncProvider;
 import '../../features/search/presentation/pages/search_page.dart';
 import '../../features/patient_history/presentation/pages/patient_history_page.dart';
 import '../../features/patient_history/presentation/pages/patient_record_detail_page.dart';
@@ -44,7 +44,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
 
       if (isInitializing) return location == '/' ? null : '/';
-      if (location == '/') return isAuthenticated ? '/home' : '/login';
+      if (location == '/') {
+        if (isAuthenticated) return '/home';
+        final onboardingDone = ref.read(onboardingDoneSyncProvider);
+        return onboardingDone ? '/login' : '/onboarding';
+      }
 
       final isOnAuthRoute = location == '/login' ||
           location == '/register' ||
