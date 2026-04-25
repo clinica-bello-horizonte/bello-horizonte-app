@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/services/local_notification_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -12,6 +13,7 @@ import '../../../doctors/domain/entities/doctor_entity.dart';
 import '../../../doctors/presentation/providers/doctors_provider.dart';
 import '../../../specialties/domain/entities/specialty_entity.dart';
 import '../../../specialties/presentation/providers/specialties_provider.dart';
+import '../../domain/entities/appointment_entity.dart';
 import '../providers/appointments_provider.dart';
 
 class CreateAppointmentPage extends ConsumerStatefulWidget {
@@ -106,25 +108,47 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
     if (!_canProceed) return;
     FocusScope.of(context).unfocus();
 
-    final success =
-        await ref.read(appointmentsNotifierProvider.notifier).createAppointment(
-              doctorId: _selectedDoctor!.id,
-              specialtyId: _selectedSpecialty!.id,
-              date: _selectedDate!,
-              time: _selectedTime!,
-              reason: _reasonController.text.trim(),
-              notes: _notesController.text.trim().isEmpty
-                  ? null
-                  : _notesController.text.trim(),
-            );
+    final doctor = _selectedDoctor!;
+    final specialty = _selectedSpecialty!;
+    final date = _selectedDate!;
+    final time = _selectedTime!;
 
-    if (mounted) {
-      if (success) {
-        context.showSuccessSnackBar('¡Cita reservada exitosamente!');
-        context.go('/appointments');
-      } else {
-        context.showErrorSnackBar('Error al reservar la cita. Intenta nuevamente.');
-      }
+    final success = await ref.read(appointmentsNotifierProvider.notifier).createAppointment(
+      doctorId: doctor.id,
+      specialtyId: specialty.id,
+      date: date,
+      time: time,
+      reason: _reasonController.text.trim(),
+      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+    );
+
+    if (!mounted) return;
+    if (success) {
+      // Programar notificación local para el día anterior
+      LocalNotificationService.instance.scheduleAppointmentReminder(
+        appointmentId: '${doctor.id}-${date.toIso8601String()}-$time',
+        appointmentDate: date,
+        doctorName: doctor.fullName,
+        time: time,
+      );
+
+      // Navegar a pantalla de éxito con resumen
+      final previewAppointment = AppointmentEntity(
+        id: '',
+        userId: '',
+        doctorId: doctor.id,
+        specialtyId: specialty.id,
+        appointmentDate: date,
+        appointmentTime: time,
+        status: AppointmentStatus.pending,
+        createdAt: DateTime.now(),
+        doctorName: doctor.fullName,
+        specialtyName: specialty.name,
+      );
+
+      context.pushReplacement('/appointments/success', extra: previewAppointment);
+    } else {
+      context.showErrorSnackBar('Error al reservar la cita. Intenta nuevamente.');
     }
   }
 

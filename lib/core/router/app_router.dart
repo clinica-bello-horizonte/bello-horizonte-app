@@ -3,8 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/appointments/presentation/pages/appointment_detail_page.dart';
+import '../../features/appointments/presentation/pages/appointment_success_page.dart';
 import '../../features/appointments/presentation/pages/appointments_page.dart';
 import '../../features/appointments/presentation/pages/create_appointment_page.dart';
+import '../../features/admin/presentation/pages/admin_stats_page.dart';
+import '../../features/appointments/domain/entities/appointment_entity.dart';
+import '../../features/waitlist/presentation/pages/waitlist_page.dart';
 import '../../features/auth/domain/entities/user_entity.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -32,6 +36,27 @@ import '../../features/specialties/presentation/pages/specialty_detail_page.dart
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+CustomTransitionPage<void> _slideTransition(GoRouterState state, Widget child) =>
+    CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 280),
+      transitionsBuilder: (_, animation, __, child) => SlideTransition(
+        position: Tween(begin: const Offset(1, 0), end: Offset.zero)
+            .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+        child: child,
+      ),
+    );
+
+CustomTransitionPage<void> _fadeTransition(GoRouterState state, Widget child) =>
+    CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 300),
+      transitionsBuilder: (_, animation, __, child) =>
+          FadeTransition(opacity: animation, child: child),
+    );
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -78,9 +103,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/login',
         pageBuilder: (context, state) => const NoTransitionPage(child: LoginPage()),
       ),
-      GoRoute(path: '/register', builder: (context, state) => const RegisterPage()),
-      GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordPage()),
-      GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingPage()),
+      GoRoute(path: '/register', pageBuilder: (context, state) => _slideTransition(state, const RegisterPage())),
+      GoRoute(path: '/forgot-password', pageBuilder: (context, state) => _slideTransition(state, const ForgotPasswordPage())),
+      GoRoute(path: '/onboarding', pageBuilder: (context, state) => _fadeTransition(state, const OnboardingPage())),
       GoRoute(
         path: '/notifications',
         parentNavigatorKey: _rootNavigatorKey,
@@ -105,6 +130,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/doctor/profile/edit',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const DoctorProfileEditPage(),
+      ),
+      GoRoute(
+        path: '/appointments/success',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => AppointmentSuccessPage(
+          appointment: state.extra as AppointmentEntity,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/stats',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AdminStatsPage(),
+      ),
+      GoRoute(
+        path: '/waitlist',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const WaitlistPage(),
       ),
       GoRoute(
         path: '/admin/doctors/:id/appointments',

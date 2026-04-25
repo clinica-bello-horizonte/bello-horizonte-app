@@ -10,6 +10,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/loading_overlay.dart';
 import '../../../appointments/presentation/providers/appointments_provider.dart';
+import '../../../appointments/presentation/providers/ratings_provider.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../specialties/presentation/providers/specialties_provider.dart';
@@ -177,6 +178,8 @@ class DoctorDetailPage extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 32),
+                      _DoctorReviewsSection(doctorId: doctor.id),
+                      const SizedBox(height: 24),
                       AppButton(
                         label: 'Reservar cita con este médico',
                         onPressed: () => context.push(
@@ -309,6 +312,67 @@ class _NextAvailableDates extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+// ─── Reseñas del médico ───────────────────────────────────────────────────────
+
+class _DoctorReviewsSection extends ConsumerWidget {
+  final String doctorId;
+  const _DoctorReviewsSection({required this.doctorId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ratingsAsync = ref.watch(doctorRatingsProvider(doctorId));
+
+    return ratingsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (ratings) {
+        if (ratings.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Reseñas de pacientes', style: AppTextStyles.h3),
+            const SizedBox(height: 12),
+            ...ratings.take(5).map((r) {
+              final stars = r['stars'] as int? ?? 0;
+              final comment = r['comment'] as String?;
+              final specialty = (r['appointment']?['specialty']?['name']) as String?;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        ...List.generate(5, (i) => Icon(
+                          i < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+                          size: 16, color: const Color(0xFFFFC107),
+                        )),
+                        const Spacer(),
+                        if (specialty != null)
+                          Text(specialty, style: AppTextStyles.caption.copyWith(color: AppColors.textGray)),
+                      ],
+                    ),
+                    if (comment != null && comment.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(comment, style: AppTextStyles.bodySmall.copyWith(height: 1.5)),
+                    ],
+                  ],
+                ),
+              );
+            }),
+          ],
+        );
+      },
     );
   }
 }

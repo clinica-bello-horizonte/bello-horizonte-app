@@ -53,4 +53,15 @@ class ApiEndpoints {
 
   // Admin appointments
   static String adminAppointmentsByDoctor(String doctorId) => '/admin/appointments/by-doctor/$doctorId';
+
+  // Admin stats
+  static const String adminStats = '/admin/stats';
+
+  // Doctor ratings
+  static String doctorRatings(String doctorId) => '/ratings/doctors/$doctorId';
+
+  // Waitlist
+  static const String waitlist = '/waitlist';
+  static const String myWaitlist = '/waitlist/my';
+  static String waitlistEntry(String id) => '/waitlist/$id';
 }

@@ -125,6 +125,15 @@ class ApiClient {
     }
   }
 
+  Future<dynamic> delete(String path) async {
+    try {
+      final res = await _dio.delete(path);
+      return _extractData(res);
+    } on DioException catch (e) {
+      throw _mapError(e);
+    }
+  }
+
   Future<dynamic> uploadFile(
     String path,
     List<int> bytes, {

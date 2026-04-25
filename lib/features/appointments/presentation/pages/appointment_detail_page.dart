@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/network/api_endpoints.dart';
@@ -43,7 +44,9 @@ class AppointmentDetailPage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildStatusHeader(appointment),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                _buildQrCard(context, appointment),
+                const SizedBox(height: 16),
                 _buildInfoCard(context, appointment),
                 const SizedBox(height: 16),
                 if (appointment.reason != null) _buildReasonCard(appointment),
@@ -89,6 +92,36 @@ class AppointmentDetailPage extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildQrCard(BuildContext context, AppointmentEntity appointment) {
+    final qrData = 'BH|${appointment.id}|${appointment.appointmentDate}|${appointment.appointmentTime}';
+    return ExpansionTile(
+      leading: const Icon(Icons.qr_code_rounded, color: AppColors.primary),
+      title: const Text('Código QR de la cita'),
+      subtitle: const Text('Muéstralo en recepción al llegar'),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Theme.of(context).dividerColor),
+      ),
+      collapsedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Theme.of(context).dividerColor),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Center(
+            child: QrImageView(
+              data: qrData,
+              version: QrVersions.auto,
+              size: 180,
+              backgroundColor: Colors.white,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

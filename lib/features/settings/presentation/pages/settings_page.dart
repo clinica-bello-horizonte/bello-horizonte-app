@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/upload_provider.dart';
@@ -201,6 +202,21 @@ class SettingsPage extends ConsumerWidget {
               ],
             ),
 
+            if (user?.role == UserRole.user)
+              _buildSection(
+                context,
+                title: 'Mis reservas',
+                items: [
+                  _SettingsItem(
+                    icon: Icons.queue_rounded,
+                    title: 'Lista de espera',
+                    subtitle: 'Slots que estás esperando',
+                    iconColor: AppColors.secondary,
+                    onTap: () => context.push('/waitlist'),
+                  ),
+                ],
+              ),
+
             if (user?.isAdmin == true)
               _buildSection(
                 context,
@@ -212,6 +228,13 @@ class SettingsPage extends ConsumerWidget {
                     subtitle: 'Avisos a pacientes',
                     iconColor: AppColors.secondary,
                     onTap: () => context.push('/admin/notifications'),
+                  ),
+                  _SettingsItem(
+                    icon: Icons.bar_chart_rounded,
+                    title: 'Estadísticas',
+                    subtitle: 'Citas, médicos y especialidades',
+                    iconColor: AppColors.primary,
+                    onTap: () => context.push('/admin/stats'),
                   ),
                 ],
               ),

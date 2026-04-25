@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
-import '../../../../core/widgets/loading_overlay.dart';
 import '../../../../core/widgets/role_guard.dart';
+import '../../../../core/widgets/skeleton_loader.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../specialties/presentation/providers/specialties_provider.dart';
 import '../providers/doctors_provider.dart';
@@ -99,8 +99,7 @@ class _DoctorsPageState extends ConsumerState<DoctorsPage> {
           // Doctors list
           Expanded(
             child: doctorsAsync.when(
-              loading: () =>
-                  const FullScreenLoader(message: 'Cargando médicos...'),
+              loading: () => buildSkeletonList(itemBuilder: () => const DoctorCardSkeleton()),
               error: (e, _) => ErrorStateWidget(message: e.toString()),
               data: (doctors) {
                 if (doctors.isEmpty) {

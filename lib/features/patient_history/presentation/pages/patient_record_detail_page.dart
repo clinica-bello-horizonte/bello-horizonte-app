@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -31,6 +34,13 @@ class PatientRecordDetailPage extends ConsumerWidget {
               icon: const Icon(Icons.arrow_back_ios_new_rounded),
               onPressed: () => context.pop(),
             ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.picture_as_pdf_rounded),
+                tooltip: 'Exportar PDF',
+                onPressed: () => _exportPdf(context, record),
+              ),
+            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
@@ -121,6 +131,89 @@ class PatientRecordDetailPage extends ConsumerWidget {
       },
     );
   }
+
+  Future<void> _exportPdf(BuildContext context, dynamic record) async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context ctx) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            // Header
+            pw.Container(
+              padding: const pw.EdgeInsets.all(16),
+              decoration: const pw.BoxDecoration(color: PdfColors.blue800),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('Clínica Bello Horizonte',
+                          style: pw.TextStyle(color: PdfColors.white, fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                      pw.Text('Registro Médico', style: const pw.TextStyle(color: PdfColors.grey300, fontSize: 12)),
+                    ],
+                  ),
+                  pw.Text(record.recordDate ?? '', style: const pw.TextStyle(color: PdfColors.white, fontSize: 12)),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 20),
+            // Info
+            if (record.doctorName != null) _pdfRow('Médico', 'Dr. ${record.doctorName}'),
+            if (record.specialtyName != null) _pdfRow('Especialidad', record.specialtyName!),
+            pw.SizedBox(height: 16),
+            if (record.diagnosis != null) ...[
+              pw.Text('Diagnóstico', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.blue800)),
+              pw.SizedBox(height: 6),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.blue200), borderRadius: pw.BorderRadius.circular(6)),
+                child: pw.Text(record.diagnosis!, style: const pw.TextStyle(fontSize: 12)),
+              ),
+              pw.SizedBox(height: 14),
+            ],
+            if (record.treatment != null) ...[
+              pw.Text('Tratamiento prescrito', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.blue800)),
+              pw.SizedBox(height: 6),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.blue200), borderRadius: pw.BorderRadius.circular(6)),
+                child: pw.Text(record.treatment!, style: const pw.TextStyle(fontSize: 12)),
+              ),
+              pw.SizedBox(height: 14),
+            ],
+            if (record.notes != null) ...[
+              pw.Text('Notas clínicas', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.blue800)),
+              pw.SizedBox(height: 6),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey400), borderRadius: pw.BorderRadius.circular(6)),
+                child: pw.Text(record.notes!, style: const pw.TextStyle(fontSize: 12)),
+              ),
+            ],
+            pw.Spacer(),
+            pw.Divider(),
+            pw.Text('Este documento es informativo. Para uso clínico oficial consulte directamente con la clínica.',
+                style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600)),
+          ],
+        ),
+      ),
+    );
+
+    await Printing.sharePdf(bytes: await pdf.save(), filename: 'registro_medico_${record.recordDate ?? 'bh'}.pdf');
+  }
+
+  pw.Widget _pdfRow(String label, String value) => pw.Padding(
+    padding: const pw.EdgeInsets.only(bottom: 6),
+    child: pw.Row(
+      children: [
+        pw.Text('$label: ', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+        pw.Text(value, style: const pw.TextStyle(fontSize: 12)),
+      ],
+    ),
+  );
 
   Widget _buildSection(String title, IconData icon, String content, Color color) {
     return Column(

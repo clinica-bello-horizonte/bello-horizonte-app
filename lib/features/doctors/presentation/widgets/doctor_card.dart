@@ -16,6 +16,11 @@ class DoctorCard extends StatelessWidget {
     this.specialtyName,
   });
 
+  bool get _availableToday {
+    final weekday = DateTime.now().weekday - 1; // 0=Lun … 6=Dom
+    return doctor.availableDays.contains(weekday);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -25,7 +30,11 @@ class DoctorCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).dividerColor),
+          border: Border.all(
+            color: _availableToday
+                ? const Color(0xFF2E7D32).withAlpha(80)
+                : Theme.of(context).dividerColor,
+          ),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withAlpha(12),
@@ -47,7 +56,30 @@ class DoctorCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(doctor.fullName, style: AppTextStyles.cardTitle),
+                  Row(
+                    children: [
+                      Expanded(child: Text(doctor.fullName, style: AppTextStyles.cardTitle, overflow: TextOverflow.ellipsis)),
+                      if (_availableToday) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E7D32).withAlpha(20),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: const Color(0xFF2E7D32).withAlpha(60)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.circle, size: 6, color: Color(0xFF2E7D32)),
+                              SizedBox(width: 3),
+                              Text('Hoy', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF2E7D32))),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                   if (specialtyName != null) ...[
                     const SizedBox(height: 2),
                     Text(specialtyName!, style: AppTextStyles.cardSubtitle),
