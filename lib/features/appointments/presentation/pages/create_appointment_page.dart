@@ -733,8 +733,10 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
         _isReschedule ? 'Confirmar reprogramación' : 'Confirmar cita';
     final showBack = _isReschedule ? false : _step > 0;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+    return SafeArea(
+      top: false,
+      child: Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         border:
@@ -770,6 +772,7 @@ class _CreateAppointmentPageState extends ConsumerState<CreateAppointmentPage> {
           ),
         ],
       ),
+    ),
     );
   }
 }
