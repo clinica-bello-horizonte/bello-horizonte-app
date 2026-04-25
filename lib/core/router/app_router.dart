@@ -58,8 +58,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (!isAuthenticated && !isOnAuthRoute) return '/login';
       if (isAuthenticated && isOnAuthRoute) return '/home';
 
-      // Doctor only routes
-      if (location.startsWith('/doctor') && authState.user?.role != UserRole.doctor) {
+      // Doctor only routes (note: /doctor/ not /doctors)
+      if (location.startsWith('/doctor/') && authState.user?.role != UserRole.doctor) {
         return '/home';
       }
 
