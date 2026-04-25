@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
 
-const _kOnboardingKey = 'onboarding_done';
+const kOnboardingKey = 'onboarding_done';
 
-/// Loaded synchronously in main() before runApp — overridden via ProviderScope.
-final onboardingDoneSyncProvider = Provider<bool>((ref) => false);
-
-/// Kept for legacy use; prefer onboardingDoneSyncProvider in the router.
-final onboardingDoneProvider = FutureProvider<bool>((ref) async {
-  const storage = FlutterSecureStorage();
-  final val = await storage.read(key: _kOnboardingKey);
-  return val == 'true';
-});
+/// Loaded in main() before runApp and overridden via ProviderScope.
+/// StateProvider so _finish() can also update it in-memory.
+final onboardingDoneSyncProvider = StateProvider<bool>((ref) => false);
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -64,8 +58,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Future<void> _finish() async {
-    const storage = FlutterSecureStorage();
-    await storage.write(key: _kOnboardingKey, value: 'true');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(kOnboardingKey, true);
+    ref.read(onboardingDoneSyncProvider.notifier).state = true;
     if (mounted) context.go('/login');
   }
 

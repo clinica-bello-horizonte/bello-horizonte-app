@@ -33,6 +33,9 @@ dependencies:
   flutter_svg: ^2.0.10+1
   shimmer: ^3.0.0
 
+  # Storage
+  shared_preferences: ^2.3.2
+
   # Utils
   uuid: ^4.4.0
   equatable: ^2.0.5
