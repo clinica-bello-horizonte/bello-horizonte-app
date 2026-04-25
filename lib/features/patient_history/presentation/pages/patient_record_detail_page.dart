@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/widgets/loading_overlay.dart';
+import '../../domain/entities/patient_record_entity.dart';
 import '../providers/patient_history_provider.dart';
 
 class PatientRecordDetailPage extends ConsumerWidget {
@@ -132,9 +133,15 @@ class PatientRecordDetailPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _exportPdf(BuildContext context, dynamic record) async {
+  Future<void> _exportPdf(BuildContext context, PatientRecordEntity record) async {
     try {
     final pdf = pw.Document();
+    final dateStr = '${record.recordDate.day.toString().padLeft(2,'0')}/'
+        '${record.recordDate.month.toString().padLeft(2,'0')}/'
+        '${record.recordDate.year}';
+    final fileDate = '${record.recordDate.year}-'
+        '${record.recordDate.month.toString().padLeft(2,'0')}-'
+        '${record.recordDate.day.toString().padLeft(2,'0')}';
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -156,7 +163,7 @@ class PatientRecordDetailPage extends ConsumerWidget {
                       pw.Text('Registro Médico', style: const pw.TextStyle(color: PdfColors.grey300, fontSize: 12)),
                     ],
                   ),
-                  pw.Text(record.recordDate ?? '', style: const pw.TextStyle(color: PdfColors.white, fontSize: 12)),
+                  pw.Text(dateStr, style: const pw.TextStyle(color: PdfColors.white, fontSize: 12)),
                 ],
               ),
             ),
@@ -203,7 +210,7 @@ class PatientRecordDetailPage extends ConsumerWidget {
       ),
     );
 
-    await Printing.sharePdf(bytes: await pdf.save(), filename: 'registro_medico_${record.recordDate ?? 'bh'}.pdf');
+    await Printing.sharePdf(bytes: await pdf.save(), filename: 'registro_medico_$fileDate.pdf');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
